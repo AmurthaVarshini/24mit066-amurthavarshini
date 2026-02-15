@@ -58,12 +58,17 @@ if not firebase_admin._apps:
         print("☁️ Using Default Credentials (Cloud) for Firebase")
         firebase_admin.initialize_app()
 
-db = firestore.client()
-print("✅ Firestore client initialized", flush=True)
+# Global DB client - initialized lazily if needed, but we'll try to init once here
+db = None
+try:
+    db = firestore.client()
+    print("✅ Firestore client initialized successfully", flush=True)
+except Exception as e:
+    print(f"⚠️ Initial Firestore connection failed: {e}. Will retry on request.", flush=True)
 
 @app.route('/health')
 def health():
-    return {"status": "healthy"}, 200
+    return {"status": "healthy", "firestore": db is not None}, 200
 
     
 # Authentication decorator
