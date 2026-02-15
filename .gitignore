@@ -14,7 +14,7 @@ hr_analyzer.db
 uploads/
 *.pdf
 *.docx
-*.txt
+
 *.log
 .DS_Store
 Thumbs.db
