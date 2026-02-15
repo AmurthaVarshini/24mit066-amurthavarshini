@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h2><i class="fas fa-briefcase"></i> Create Job Posting</h2>
+                <p>Create job postings and send automated interview invitations</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header"
+                style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Job Details & Email Setup</h4>
+            </div>
+            <div class="card-body">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div
+                    class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST" id="jobPostingForm">
+                    <div class="row">
+                        <!-- Job Information Column -->
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3"><i class="fas fa-briefcase"></i> Job Information</h5>
+
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Job Title <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="title" id="title" required>
+                                <div class="form-text">e.g., "Senior Python Developer"</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Job Description</label>
+                                <textarea class="form-control" name="description" id="description" rows="4"
+                                    placeholder="Describe the role, responsibilities, and company culture..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="requirements" class="form-label">Requirements</label>
+                                <textarea class="form-control" name="requirements" id="requirements" rows="3"
+                                    placeholder="List required skills, experience, and qualifications..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="candidate_limit" class="form-label">Number of Candidates to
+                                    Interview</label>
+                                <input type="number" class="form-control" name="candidate_limit" value="10" min="1"
+                                    max="50" required>
+                                <div class="form-text">Top N candidates will be selected for interviews</div>
+                            </div>
+                        </div>
+
+                        <!-- Email Configuration Column -->
+                        <div class="col-md-6">
+                            <h5 class="text-success mb-3"><i class="fas fa-envelope"></i> Email Configuration</h5>
+
+                            <div class="mb-3">
+                                <label for="sender_email" class="form-label">Your Email Address <span
+                                        class="text-danger">*</span></label>
+                                <input type="email" class="form-control" name="sender_email" id="sender_email" required>
+                                <div class="form-text">This will be used to send emails</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="sender_password" class="form-label">Email Password <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" name="sender_password"
+                                        id="sender_password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    <small class="text-warning">
+                                        <i class="fas fa-info-circle"></i> For Gmail, use App Password instead of
+                                        regular password.
+                                        <a href="https://support.google.com/accounts/answer/185833"
+                                            target="_blank">Learn how</a>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="sender_name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" name="sender_name" id="sender_name"
+                                    placeholder="HR Manager">
+                                <div class="form-text">Name that will appear in emails</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="company_name" class="form-label">Company Name</label>
+                                <input type="text" class="form-control" name="company_name" id="company_name"
+                                    placeholder="Your Company">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Template Section -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5 class="text-info mb-3"><i class="fas fa-edit"></i> Email Template</h5>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email_subject" class="form-label">Email Subject</label>
+                                        <input type="text" class="form-control" name="email_subject" id="email_subject"
+                                            value="Interview Invitation - {job_title}"
+                                            placeholder="Interview Invitation - {job_title}">
+                                        <div class="form-text">Use {job_title} for dynamic job title insertion</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="template_type" class="form-label">Email Style</label>
+                                        <select class="form-control" name="template_type" id="template_type"
+                                            onchange="updateEmailTemplate()">
+                                            <option value="standard">Standard Professional</option>
+                                            <option value="technical">Technical Role Focus</option>
+                                            <option value="executive">Executive/Senior Level</option>
+                                            <option value="startup">Casual Startup Style</option>
+                                            <option value="formal">Formal Corporate</option>
+                                        </select>
+                                        <div class="form-text">Choose the tone that matches your company culture</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email_template" class="form-label">Email Content</label>
+                                <textarea class="form-control" name="email_template" id="email_template" rows="10"
+                                    required>Dear {candidate_name},
+
+Greetings from {company_name}!
+
+🎉 Congratulations! Your application for the position of {job_title} has been shortlisted.
+
+We were impressed by your profile and would like to invite you for an interview to discuss this exciting opportunity.
+
+📊 YOUR PROFILE ASSESSMENT:
+Based on our AI-powered analysis of your resume:
+• Overall Score: {total_score}/10
+• Technical Skills: {technical_score}/10
+• Experience Level: {experience_score}/10
+• Education Background: {education_score}/10
+
+🏢 ABOUT THE ROLE:
+Position: {job_title}
+Company: {company_name}
+Department: Technology
+
+📅 NEXT STEPS:
+Our HR team will contact you within 2-3 business days with:
+• Interview schedule (we'll work around your availability)
+• Interview format (in-person/virtual based on preference)
+• Technical assessment details (if applicable)
+• List of documents to prepare
+
+💡 INTERVIEW PREPARATION TIPS:
+• Review the job description and company information
+• Prepare examples of your technical projects
+• Be ready to discuss your problem-solving approach
+• Have questions ready about the role and company culture
+
+We're excited about the possibility of you joining our team and look forward to learning more about your experience and aspirations.
+
+Best regards,
+{sender_name}
+HR Team, {company_name}
+
+📧 Questions? Reply to this email
+🌐 Learn more about us: [Company Website]
+
+---
+This invitation was sent automatically based on your resume analysis.
+Your contact information: {candidate_phone}</textarea>
+                                <div class="form-text">
+                                    <strong>Available placeholders:</strong>
+                                    <span class="badge bg-secondary">{candidate_name}</span>
+                                    <span class="badge bg-secondary">{job_title}</span>
+                                    <span class="badge bg-secondary">{company_name}</span>
+                                    <span class="badge bg-secondary">{sender_name}</span>
+                                    <span class="badge bg-secondary">{total_score}</span>
+                                    <span class="badge bg-secondary">{technical_score}</span>
+                                    <span class="badge bg-secondary">{experience_score}</span>
+                                    <span class="badge bg-secondary">{education_score}</span>
+                                    <span class="badge bg-secondary">{candidate_phone}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-outline-primary me-2" id="previewBtn">
+                            <i class="fas fa-eye"></i> Preview Email
+                        </button>
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="fas fa-paper-plane"></i> Create Job & Send Invitations
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Existing Job Postings -->
+{% if jobs %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-list"></i> Your Job Postings</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Created</th>
+                                <th>Max Candidates</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                            <tr>
+                                <td><strong>{{ job.title }}</strong></td>
+                                <td>{{ job.created_at.strftime('%Y-%m-%d') if job.created_at else 'N/A' }}</td>
+                                <td>{{ job.max_candidates }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if job.is_active else 'secondary' }}">
+                                        {{ 'Active' if job.is_active else 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Email Preview Modal -->
+<div class="modal fade" id="emailPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-envelope"></i> Email Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong>Subject:</strong>
+                    <div id="previewSubject" class="border p-2 bg-light"></div>
+                </div>
+                <div class="mb-3">
+                    <strong>Content:</strong>
+                    <div id="previewContent" class="border p-3 bg-light" style="white-space: pre-line;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: #f5576c;
+        box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.25);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+    }
+
+    .badge {
+        margin: 2px;
+    }
+
+    #emailPreviewModal .modal-content {
+        border-radius: 15px;
+    }
+
+    .alert {
+        border-radius: 12px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('sender_password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+
+        // Email preview functionality
+        const previewBtn = document.getElementById('previewBtn');
+        const previewModal = new bootstrap.Modal(document.getElementById('emailPreviewModal'));
+
+        previewBtn.addEventListener('click', function () {
+            const jobTitle = document.getElementById('title').value || 'Sample Job Title';
+            const companyName = document.getElementById('company_name').value || 'Your Company';
+            const senderName = document.getElementById('sender_name').value || 'HR Manager';
+            const candidateName = 'John Doe'; // Sample candidate name
+
+            const emailSubject = document.getElementById('email_subject').value;
+            const emailTemplate = document.getElementById('email_template').value;
+
+            // Replace placeholders
+            const previewSubject = emailSubject
+                .replace('{job_title}', jobTitle)
+                .replace('{company_name}', companyName)
+                .replace('{sender_name}', senderName)
+                .replace('{candidate_name}', candidateName);
+
+            const previewContent = emailTemplate
+                .replace(/{job_title}/g, jobTitle)
+                .replace(/{company_name}/g, companyName)
+                .replace(/{sender_name}/g, senderName)
+                .replace(/{candidate_name}/g, candidateName);
+
+            document.getElementById('previewSubject').textContent = previewSubject;
+            document.getElementById('previewContent').textContent = previewContent;
+
+            previewModal.show();
+        });
+
+        // Form validation
+        const form = document.getElementById('jobPostingForm');
+        form.addEventListener('submit', function (e) {
+            const requiredFields = ['title', 'sender_email', 'sender_password', 'email_template'];
+            let isValid = true;
+
+            requiredFields.forEach(function (fieldId) {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Job & Sending Emails...';
+            submitBtn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

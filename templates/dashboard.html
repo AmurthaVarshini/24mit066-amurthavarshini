@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HR Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #667eea !important;
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .container-fluid {
+            padding: 2rem;
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-card h2 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-card p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .icon-candidates {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .icon-rules {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .icon-jobs {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .icon-accuracy {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .content-card h4 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .btn-rules {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .btn-candidates {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .btn-jobs {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .feature-box {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: rgba(102, 126, 234, 0.05);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-box:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .feature-box h6 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-box p {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-users-cog"></i> HR Analyzer
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/upload">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/candidates">Candidates</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/scoring-rules">Rules</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/job-posting">Jobs</a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav">
+                    <span class="user-info me-3">
+                        <i class="fas fa-user"></i> Admin
+                    </span>
+                    <a href="/logout" class="btn logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <!-- Welcome Card -->
+        <div class="welcome-card">
+            <h2><i class="fas fa-wave-square"></i> Welcome to HR Analyzer!</h2>
+            <p>Your AI-powered recruitment dashboard is ready. Upload resumes, set scoring rules, and let artificial intelligence help you find the best candidates.</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon icon-candidates">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Total Candidates</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon icon-rules">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Scoring Rules</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon icon-jobs">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Active Jobs</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon icon-accuracy">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">AI Accuracy</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Getting Started -->
+            <div class="col-lg-8">
+                <div class="content-card">
+                    <h4><i class="fas fa-rocket"></i> Getting Started Guide</h4>
+                    
+                    <div class="alert alert-primary">
+                        <h5><i class="fas fa-lightbulb"></i> Quick Start Steps</h5>
+                        <ol class="mb-0">
+                            <li><strong>Upload Resumes:</strong> Add candidate files (PDF, DOCX, TXT)</li>
+                            <li><strong>Create Scoring Rules:</strong> Define evaluation criteria</li>
+                            <li><strong>Review Results:</strong> See AI-powered candidate rankings</li>
+                            <li><strong>Post Jobs:</strong> Create job listings with requirements</li>
+                        </ol>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="feature-box">
+                                <div class="feature-icon">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <h6>AI-Powered Analysis</h6>
+                                <p>Advanced algorithms analyze resumes and extract key information automatically</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-box">
+                                <div class="feature-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <h6>Smart Scoring</h6>
+                                <p>Customizable scoring system ranks candidates based on your criteria</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="col-lg-4">
+                <div class="content-card">
+                    <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
+                    
+                    <a href="/upload" class="action-btn btn-upload">
+                        <i class="fas fa-upload"></i> Upload Resume
+                    </a>
+                    
+                    <a href="/scoring-rules" class="action-btn btn-rules">
+                        <i class="fas fa-plus"></i> Add Scoring Rule
+                    </a>
+                    
+                    <a href="/candidates" class="action-btn btn-candidates">
+                        <i class="fas fa-list"></i> View Candidates
+                    </a>
+                    
+                    <a href="/job-posting" class="action-btn btn-jobs">
+                        <i class="fas fa-briefcase"></i> Create Job Posting
+                    </a>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6><i class="fas fa-info-circle text-info"></i> Pro Tip</h6>
+                        <p class="small mb-0">Start by uploading a few sample resumes to see how the AI analysis works!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple, error-free JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('HR Analyzer Dashboard Loaded Successfully! 🎉');
+            
+            // Simple hover effects for action buttons
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(function(button) {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.02)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Welcome message
+            setTimeout(function() {
+                console.log('💡 Ready to start your recruitment journey?');
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

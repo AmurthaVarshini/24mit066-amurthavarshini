@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Scoring Rules</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4>Add New Rule</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="rule_type">Rule Type</label>
+                        <select class="form-control" name="rule_type" required>
+                            <option value="">Select Type</option>
+                            <option value="skill">Technical Skills</option>
+                            <option value="experience">Experience (Years)</option>
+                            <option value="education">Education Level</option>
+                            <option value="general">General Keywords</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="keyword">Keyword</label>
+                        <input type="text" class="form-control" name="keyword" required>
+                        <small class="text-muted">e.g., "python", "5" (for years), "bachelor"</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="points">Points (1-50)</label>
+                        <input type="number" class="form-control" name="points" min="1" max="50" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Add Rule</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Current Rules</h4>
+            </div>
+            <div class="card-body">
+                {% if rules %}
+                {% for rule in rules %}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>{{ rule.keyword }}</h6>
+                                <small>Type: {{ rule.rule_type }}</small><br>
+                                <small>Created: {{ rule.created_at.strftime('%Y-%m-%d') if rule.created_at else 'N/A'
+                                    }}</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-primary me-2">{{ rule.points }} pts</span>
+                                <form method="POST" action="{{ url_for('delete_rule', rule_id=rule.id) }}"
+                                    onsubmit="return confirm('Are you sure you want to delete this rule?')"
+                                    style="display: inline;">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Rule">
+                                        🗑️
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted">No rules defined yet. Add your first rule!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

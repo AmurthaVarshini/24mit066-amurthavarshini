@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Resume</h2>
+                <p>Upload candidate resumes for AI-powered analysis and scoring</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card feature-card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <i class="fas fa-file-upload text-primary"></i> Candidate Information
+                </h4>
+                
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">
+                                    <i class="fas fa-user text-primary"></i> Candidate Name
+                                </label>
+                                <input type="text" class="form-control" name="name" id="name" required>
+                                <div class="form-text">Enter the candidate's full name</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope text-primary"></i> Email Address
+                                </label>
+                                <input type="email" class="form-control" name="email" id="email">
+                                <div class="form-text">Optional: Will be extracted from resume if not provided</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">
+                                    <i class="fas fa-phone text-primary"></i> Phone Number
+                                </label>
+                                <input type="text" class="form-control" name="phone" id="phone">
+                                <div class="form-text">Optional: Will be extracted from resume if not provided</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">
+                                    <i class="fas fa-file text-primary"></i> Resume File <span class="text-danger">*</span>
+                                </label>
+                                <input type="file" class="form-control" name="file" id="file" accept=".pdf,.docx,.txt" required>
+                                <div class="form-text">Supported formats: PDF, DOCX, TXT (Max 10MB)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Preview Section -->
+                    <div id="filePreview" class="mb-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-file-alt"></i> Selected File:</h6>
+                            <div id="fileName"></div>
+                            <div id="fileSize"></div>
+                            <div id="fileType"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload Progress -->
+                    <div id="uploadProgress" class="mb-3" style="display: none;">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted">Processing resume...</small>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5" id="submitBtn">
+                            <i class="fas fa-upload"></i> Upload & Analyze Resume
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Instructions Card -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-info-circle text-info"></i> Upload Instructions
+                </h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-file-pdf text-danger"></i> PDF Files</h6>
+                        <p class="small text-muted">Best for formatted resumes with clear text structure</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-file-word text-primary"></i> DOCX Files</h6>
+                        <p class="small text-muted">Microsoft Word documents with excellent text extraction</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-file-alt text-success"></i> TXT Files</h6>
+                        <p class="small text-muted">Plain text files for simple resume formats</p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <h6><i class="fas fa-robot"></i> AI Analysis Features:</h6>
+                    <ul class="mb-0">
+                        <li>Automatic extraction of contact information</li>
+                        <li>Skills identification and categorization</li>
+                        <li>Experience years calculation</li>
+                        <li>Education level detection</li>
+                        <li>Intelligent scoring based on your rules</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+#filePreview {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const fileType = document.getElementById('fileType');
+    const uploadForm = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const uploadProgress = document.getElementById('uploadProgress');
+    
+    // File input change handler
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Show file preview
+            fileName.innerHTML = `<strong>Name:</strong> ${file.name}`;
+            fileSize.innerHTML = `<strong>Size:</strong> ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            fileType.innerHTML = `<strong>Type:</strong> ${file.type || 'Unknown'}`;
+            filePreview.style.display = 'block';
+            
+            // Validate file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size exceeds 10MB limit. Please choose a smaller file.');
+                fileInput.value = '';
+                filePreview.style.display = 'none';
+                return;
+            }
+            
+            // Validate file type
+            const allowedTypes = ['.pdf', '.docx', '.txt'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            if (!allowedTypes.includes(fileExtension)) {
+                alert('Invalid file type. Please upload PDF, DOCX, or TXT files only.');
+                fileInput.value = '';
+                filePreview.style.display = 'none';
+                return;
+            }
+        } else {
+            filePreview.style.display = 'none';
+        }
+    });
+    
+    // Form submission handler
+    uploadForm.addEventListener('submit', function(e) {
+        const file = fileInput.files[0];
+        if (!file) {
+            e.preventDefault();
+            alert('Please select a file to upload.');
+            return;
+        }
+        
+        const name = document.getElementById('name').value.trim();
+        if (!name) {
+            e.preventDefault();
+            alert('Please enter the candidate name.');
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        submitBtn.disabled = true;
+        uploadProgress.style.display = 'block';
+        
+        // Simulate progress (since we can't track actual upload progress easily)
+        let progress = 0;
+        const progressBar = document.querySelector('.progress-bar');
+        const interval = setInterval(function() {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            progressBar.style.width = progress + '%';
+        }, 200);
+        
+        // Stop simulation after form submission
+        setTimeout(function() {
+            clearInterval(interval);
+        }, 2000);
+    });
+    
+    // Auto-fill name from filename (optional helper)
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const nameInput = document.getElementById('name');
+        
+        if (file && !nameInput.value) {
+            // Try to extract name from filename
+            let suggestedName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+            suggestedName = suggestedName.replace(/[_-]/g, ' '); // Replace underscores/dashes with spaces
+            suggestedName = suggestedName.replace(/\b\w/g, l => l.toUpperCase()); // Capitalize words
+            
+            if (suggestedName.length > 3 && suggestedName.length < 50) {
+                nameInput.value = suggestedName;
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
