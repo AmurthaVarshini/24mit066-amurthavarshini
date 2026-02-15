@@ -19,7 +19,7 @@ from email.mime.multipart import MIMEMultipart
 import ssl
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-this-in-production'
+app.secret_key = os.environ.get('SECRET_KEY', 'default-dev-key-12345')
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
@@ -59,6 +59,11 @@ if not firebase_admin._apps:
         firebase_admin.initialize_app()
 
 db = firestore.client()
+print("✅ Firestore client initialized", flush=True)
+
+@app.route('/health')
+def health():
+    return {"status": "healthy"}, 200
 
     
 # Authentication decorator

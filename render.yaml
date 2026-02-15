@@ -3,7 +3,10 @@ services:
     name: hr-analyzer
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn main:app
+    startCommand: gunicorn -b 0.0.0.0:$PORT --timeout 120 main:app
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
+      - key: PYTHONUNBUFFERED
+        value: "1"
